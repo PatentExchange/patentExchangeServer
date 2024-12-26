@@ -1,12 +1,16 @@
 const mongoose = require("mongoose")
 const argon2 = require("argon2")
+const dayjs = require("dayjs")
 
 const userSchema = new mongoose.Schema({
     name:{type:String},
     email:{type:String,required:true,unique:true},
     password:{type:String,required:true},
-    createdAt:{type:Date,default:Date.now},
-    updatedAt:{type:Date,default:Date.now}
+    role:{type:String,default:"User"},
+    status:{type:String,default:"Active"},
+    lastLogin:{type:Date},
+    createdAt:{type:Date,default:dayjs().format("MM/DD/YYYY HH:mm:ss")},
+    updatedAt:{type:Date,default:dayjs().format("MM/DD/YYYY HH:mm:ss")}
 })
 
 userSchema.pre('save',async function (next){
