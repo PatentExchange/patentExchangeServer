@@ -19,7 +19,7 @@ app.use(cors(corsOptions));
 app.use(express.json())
 
 try{
-    mongoose.connect(process.env.MONGO_URI, {
+    mongoose.connect(process.env.MONGO_URI || "mongodb+srv://PatentExchangeDBAdmin:PatentExchangeDBAdmin@cluster0.5gkfa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
     useNewUrlParser: true,
     useUnifiedTopology: true
     });
