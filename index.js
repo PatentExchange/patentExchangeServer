@@ -11,7 +11,7 @@ const app = express()
 const corsOptions = {
     origin: 'https://patentexchangeserver.onrender.com',
     methods: 'GET,POST,PUT,DELETE',
-    credentials: true
+    credentials: true,
   };
   
 app.use(cors(corsOptions));
