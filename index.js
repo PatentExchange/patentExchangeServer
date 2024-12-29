@@ -18,12 +18,13 @@ try{
     console.log("error connecting to database"+ error)
 }
 const corsOptions = {
-    origin: 'https://patentexchange.onrender.com',
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true,
-  };
+  origin: ['https://patentexchange.onrender.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+};
   
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json())
 
