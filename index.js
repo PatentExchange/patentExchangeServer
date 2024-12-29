@@ -8,6 +8,14 @@ const dayjs = require("dayjs")
 require("dotenv").config()
 
 const app = express()
+const corsOptions = {
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    methods: 'GET,POST,PUT,DELETE', // Allow specific HTTP methods
+    credentials: true, // Allow cookies and credentials
+  };
+  
+app.use(cors(corsOptions));
+
 app.use(express.json())
 app.use(cors())
 
