@@ -18,7 +18,7 @@ try{
     console.log("error connecting to database"+ error)
 }
 const corsOptions = {
-    origin: 'https://patentexchangeserver.onrender.com',
+    origin: 'https://patentexchange.onrender.com',
     methods: 'GET,POST,PUT,DELETE',
     credentials: true,
   };
