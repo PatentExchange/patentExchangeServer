@@ -8,16 +8,6 @@ const dayjs = require("dayjs")
 require("dotenv").config()
 
 const app = express()
-const corsOptions = {
-    origin: 'https://patentexchangeserver.onrender.com',
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true,
-  };
-  
-app.use(cors(corsOptions));
-
-app.use(express.json())
-
 try{
     mongoose.connect(process.env.MONGO_URI || "mongodb+srv://PatentExchangeDBAdmin:PatentExchangeDBAdmin@cluster0.5gkfa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
     useNewUrlParser: true,
@@ -27,6 +17,15 @@ try{
 }catch(error){
     console.log("error connecting to database"+ error)
 }
+const corsOptions = {
+    origin: 'https://patentexchangeserver.onrender.com',
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true,
+  };
+  
+app.use(cors(corsOptions));
+
+app.use(express.json())
 
 app.post("/signup",async (req,res)=>{
     try {
