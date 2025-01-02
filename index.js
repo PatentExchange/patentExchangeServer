@@ -8,27 +8,25 @@ const dayjs = require("dayjs")
 require("dotenv").config()
 
 const app = express()
+app.use(express.json())
+
+try{
+    mongoose.connect("mongodb+srv://PatentExchangeDBAdmin:PatentExchangeDBAdmin@cluster0.5gkfa.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0");
+    console.log("connected to mongodb database");
+}catch(error){
+    console.log("error connecting to database"+ error)
+}
+
 const corsOptions = {
-    origin: 'https://patentexchangeserver.onrender.com',
+    origin: "https://patentexchangeserver.onrender.com",
     methods: 'GET,POST,PUT,DELETE',
     credentials: true,
   };
   
 app.use(cors(corsOptions));
 
-app.use(express.json())
-
-try{
-    mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-    });
-    console.log("connected to mongodb database");
-}catch(error){
-    console.log("error connecting to database"+ error)
-}
-
 app.post("/signup",async (req,res)=>{
+    console.log("signup works")
     try {
         const user = await UserModel.create(req.body);
         const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, process.env.JWT_SECRET);
@@ -68,4 +66,4 @@ app.get("/get-user/:id",async(req,res)=>{
 
 })
 
-app.listen(3002,()=>{console.log("Server has started")})
+app.listen(3002,()=>{console.log("Server has started",process.env.MONGO_URI)})
