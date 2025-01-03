@@ -11,10 +11,6 @@ connectDB();
 
 app.use(cors({origin:"*"}));
 app.use(express.json())
-
-
-
-
 app.use("/",userRoutes)
 app.use("/",patentRoutes)
 
