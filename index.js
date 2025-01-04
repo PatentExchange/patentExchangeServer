@@ -4,6 +4,7 @@ const cors = require("cors")
 const connectDB = require("./config/database")
 const userRoutes = require("./routes/userRoutes");
 const patentRoutes = require("./routes/patentRoutes");
+const path = require("path")
 
 const app = express()
 
@@ -11,6 +12,7 @@ connectDB();
 
 app.use(cors({origin:"*"}));
 app.use(express.json())
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/",userRoutes)
 app.use("/",patentRoutes)
 

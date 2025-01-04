@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
     role:{type:String,default:"User"},
     status:{type:String,default:"Active"},
     lastLogin:{type:Date},
+    verified:{type:Boolean,default:false},
     createdAt:{type:Date,default:dayjs().format("MM/DD/YYYY HH:mm:ss")},
     updatedAt:{type:Date,default:dayjs().format("MM/DD/YYYY HH:mm:ss")}
 })

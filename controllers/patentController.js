@@ -43,7 +43,11 @@ exports.addPatent = [
                   : [],
                 images: files.images ? files.images.map((file) => file.path) : [],
               };
-                const patent = new PatentModel(patentData);
+              const patent = new PatentModel(patentData);
+              const baseUrl = "https://patentexchange.onrender.com";
+              patent.images = patent.images.map((image) =>
+                `${baseUrl}/${image.replace(/\\/g, "/")}`
+              );
                 await patent.save();
                 res.status(200).json({ message: "Patent saved successfully", patent });
         }catch(error){
