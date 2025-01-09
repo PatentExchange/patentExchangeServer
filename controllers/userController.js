@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken")
 const dayjs = require("dayjs")
 const mongoose = require("mongoose")
 const nodemailer = require("nodemailer")
+var ObjectId = require('mongodb').ObjectId;
 
 
 let transporter = nodemailer.createTransport({
@@ -86,6 +87,53 @@ exports.login = async (req, res) => {
     }
 };
 
+exports.forgotPassword = async (req,res)=>{
+    
+    const {email} = req.body;
+    console.log(email);
+    try{
+        const user = await UserModel.findOne({email:email});
+        
+        if(!user){
+            return res.send({Status:"User does'nt exist!"})
+        }
+        const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:"1d"})
+        console.log(token);
+        const _id = user._id.toString();
+        console.log(_id)
+        await sendForgotPasswordMails({_id,token,email});
+        res.status(201).json({
+            status:"PENDING",
+            message: "OTP Verification Pending.",
+            user,token
+        });
+    }catch(error){
+        res.status(400).json({ status:"FAILED",message: error.message });
+    }
+
+}
+
+exports.resetPassword = async (req,res)=>{
+    const {_id,token}=req.params;
+    const {password}= req.body;
+    jwt.verify(token,process.env.JWT_SECRET,(err,decoded)=>{
+        if(err){
+            return res.json({Status:"Error with token"});
+        }else{
+            argon2.hash(password).then((hash)=>{
+                UserModel.findByIdAndUpdate({_id:_id},{password:hash}).then(u=>{
+                    console.log("updated with :",password);
+                    res.send({Status:"Success"});
+                }).catch(err=>{
+                    res.send({Status:err})
+                });
+            }).catch(err=>{
+                res.send({Status:err})
+            });
+        }
+    });
+}
+
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await UserModel.find();
@@ -109,7 +157,7 @@ exports.getUserById = async (req, res) => {
 };
 
 //Function for sending otp
-const sendOTPVerificationMail=async({_id,email},res)=>{
+const sendOTPVerificationMail=async({_id,token},res)=>{
     try{
         const OTP = `${Math.floor(1000+Math.random()*9000)}`;
         const hashedOTP = await argon2.hash(OTP);
@@ -141,6 +189,41 @@ const sendOTPVerificationMail=async({_id,email},res)=>{
         await transporter.sendMail(mailOptions);
         
     }catch(err){
+        res.json({
+            status:"FAILED",
+            message:err.message
+        })
+    }
+}
+
+const sendForgotPasswordMails=async({_id,token,email},res)=>{
+    try{
+        const mailOptions = {
+            
+            from: process.env.AUTH_EMAIL,
+            to: email,
+            subject: "Reset Your Password - PatentExchange",
+            html: `
+              <p>Dear User,</p>
+              <p>We received a request to reset your password for your PatentExchange account. If you made this request, please click the link below to reset your password:</p>
+              <p>
+                <a href="http://localhost:5173/reset-password/${_id}/${token}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+              </p>
+              <p>This link is valid for the next 10 minutes. If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+              <br>
+              <p>For additional assistance, please contact our support team.</p>
+              <p>
+                Best regards,<br>
+                The PatentExchange Team<br>
+                <a href="https://PatentExchange.com" target="_blank">PatentExchange.com</a>
+              </p>
+            `,
+          };
+        
+        await transporter.sendMail(mailOptions);
+        
+    }catch(err){
+        
         res.json({
             status:"FAILED",
             message:err.message
