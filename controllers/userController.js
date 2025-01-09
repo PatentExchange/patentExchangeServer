@@ -157,7 +157,7 @@ exports.getUserById = async (req, res) => {
 };
 
 //Function for sending otp
-const sendOTPVerificationMail=async({_id,token},res)=>{
+const sendOTPVerificationMail=async({_id,email,token},res)=>{
     try{
         const OTP = `${Math.floor(1000+Math.random()*9000)}`;
         const hashedOTP = await argon2.hash(OTP);
