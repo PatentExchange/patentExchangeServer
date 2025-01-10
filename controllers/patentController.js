@@ -66,3 +66,12 @@ exports.getPatents = async (req,res) => {
     }
 }
 
+exports.getAllPatent = async (req,res) =>{
+    try{
+        const patents = await PatentModel.find();
+        res.json({status:"Success",patents});
+    }catch(err){
+        res.json({status:"FAILED",err});
+    }
+}
+

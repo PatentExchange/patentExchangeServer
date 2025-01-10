@@ -12,11 +12,11 @@ const PatentSchema = new mongoose.Schema({
   },
   assignee: {
     type: String,
-    required: true, // Assignee field added
+    required: true,
   },
   submission_date: {
     type: Date,
-    default: Date.now, // Defaults to the current date
+    default: Date.now,
   },
   filingDate: {
     type: Date,
@@ -33,10 +33,14 @@ const PatentSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ["Mechanical", "Electrical", "Chemical", "Software", "Biological", "Other"], // Example categories
+    enum: ["Mechanical", "Electrical", "Chemical", "Software", "Biological", "Other"], 
   },
   prior_art_references: {
-    type: [String], // Array of strings
+    type: [String],
+  },
+  price:{
+    type: Number,
+    default: 299
   },
   type: {
     type: String,
