@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
     userId:{type:String, required:true},
     patentsOrdered: {type: String,required:true},
     orderDate:{type:String},
-    paymentMode:{type:String, default: Date.now, enum: ["UPI", "Credit Card/Debit Card", "Cash on Delivery"], default: "UPI"},
+    paymentMode:{type:String, default: Date.now, enum: ["UPI", "Credit/Debit Card", "COD"], default: "UPI"},
     orderPrice:{type:Number},
     // shippingAddress:{type:String},
     // name:{type:String, required:true},
