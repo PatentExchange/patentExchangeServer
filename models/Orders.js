@@ -1,7 +1,15 @@
 const mongoose = require('mongoose')
 
 const orderSchema = new mongoose.Schema({
-    name:{type:String, required:true},
+    orderID:{type:Number, required:true, unique:true},
+    orderQuantity:{type:Number, required:true, min:1},
+    userId:{type:String, required:true},
+    patentsOrdered: {type: String,required:true},
+    orderDate:{type:String},
+    paymentMode:{type:String, default: Date.now, enum: ["UPI", "Credit Card/Debit Card", "Cash on Delivery"], default: "UPI"},
+    orderPrice:{type:Number},
+    // shippingAddress:{type:String},
+    // name:{type:String, required:true},
     // contactNumber:{type:Number, required:true, },
     // orderID:{type:Number, required:true, unique:true},
     // orderQuantity:{type:Number, required:true, min:1},
