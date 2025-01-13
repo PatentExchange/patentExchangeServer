@@ -4,7 +4,7 @@ const patentModel = require("../models/Patents");
 exports.addOrders = async (req,res)=>{
     try{
         const order = await orderModel.create(req.body);
-        console.log("Oder created :", order );
+        // console.log("Oder created :", order );
         res.status(201).json({
             status:"Success",
             order
@@ -31,13 +31,13 @@ exports.getUserOrders = async (req,res)=>{
 exports.getOrderedPatents = async (req,res)=>{
     try{
         const patents = req.body.patents;
-        console.log(patents);
+        // console.log(patents);
         if(!Array.isArray(patents) ||  patents.length === 0){
             return res.status(400).json({message:"Invalid input"});
         }
 
         const matchingPatent = await patentModel.find({title:{$in:patents}});
-        console.log(matchingPatent);
+        // console.log(matchingPatent);
         if (matchingPatent.length === 0) {
             return res.status(404).json({ message: "No matching patents found" });
         }

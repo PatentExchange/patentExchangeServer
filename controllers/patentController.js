@@ -23,6 +23,7 @@ exports.addPatent = [
     }]),
     async(req,res)=>{
         try{
+            console.log("req received");
             const {body,files}=req;
             const patentData = {
                 title: body.title,
@@ -49,11 +50,15 @@ exports.addPatent = [
                 `${baseUrl}/${image.replace(/\\/g, "/")}`
               );
                 await patent.save();
+                console.log("Patent saved successfully",patent);
                 res.status(200).json({ message: "Patent saved successfully", patent });
         }catch(error){
             console.error(error);
-            res.status(500).json({ message:"FAILED on server side",error: error });
-        }
+            res.status(500).json({
+                message: "An error occurred while fetching patent details",
+                error: err.message,
+              });
+              }
     }
 ]
 exports.getPatents = async (req,res) => {
