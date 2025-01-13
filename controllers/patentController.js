@@ -52,7 +52,7 @@ exports.addPatent = [
                 res.status(200).json({ message: "Patent saved successfully", patent });
         }catch(error){
             console.error(error);
-            res.status(500).json({ error: "Failed to save patent" });
+            res.status(500).json({ message:"FAILED on server side",error: error });
         }
     }
 ]
