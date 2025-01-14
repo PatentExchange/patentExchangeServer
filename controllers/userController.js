@@ -78,7 +78,7 @@ exports.login = async (req, res) => {
             uf.lastLogin = dayjs().format("MM/DD/YYYY HH:mm:ss");
             await uf.save();
             const token = jwt.sign({ id: uf._id, name: uf.name, email: uf.email }, process.env.JWT_SECRET);
-            res.status(200).json({ message: "Login successful!", token });
+            res.status(200).json({ message: "Login successful!", token, uf });
         } else {
             res.status(400).json({ message: "User not found." });
         }
@@ -207,7 +207,7 @@ const sendForgotPasswordMails=async({_id,token,email},res)=>{
               <p>Dear User,</p>
               <p>We received a request to reset your password for your PatentExchange account. If you made this request, please click the link below to reset your password:</p>
               <p>
-                <a href="http://localhost:5173/reset-password/${_id}/${token}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+                <a href="https://patentexchangeserver.onrender.com/reset-password/${_id}/${token}" style="display: inline-block; padding: 10px 20px; color: white; background-color: #007bff; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
               </p>
               <p>This link is valid for the next 10 minutes. If you did not request a password reset, you can safely ignore this email. Your password will remain unchanged.</p>
               <br>
