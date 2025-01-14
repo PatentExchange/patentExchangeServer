@@ -5,6 +5,7 @@ const connectDB = require("./config/database")
 const userRoutes = require("./routes/userRoutes");
 const patentRoutes = require("./routes/patentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const path = require("path")
 
 const app = express()
@@ -17,5 +18,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/",userRoutes)
 app.use("/",patentRoutes)
 app.use("/",orderRoutes)
+app.use("/admin",adminRoutes)
 
 app.listen(3002,()=>{console.log("Server has started")})
