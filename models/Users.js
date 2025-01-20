@@ -18,7 +18,9 @@ userSchema.pre('save',async function (next){
     if(!this.isModified("password") ) return next();
     this.password = await argon2.hash(this.password);
     next();
-})
+})//before the document is saved to the db, this function will be fired
+
+//for firing a function after the document is saved to the db , use userSchema.post('save',function(doc,next){})
 
 const UserModel = mongoose.model("Users",userSchema);
 module.exports=UserModel;
