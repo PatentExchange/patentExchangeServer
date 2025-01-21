@@ -1,0 +1,46 @@
+POST http://localhost:3002/add-transfer
+Content-Type: application/json
+
+{
+  "sellerEmail":"rizafarooq39@gmail.com",
+  "buyerEmail":"ankit.ganglia@gmail.com",
+  "patentId":"6780adca74c46b1849110661"
+}
+
+###
+
+POST http://localhost:3002/get-transfers
+Content-Type: application/json
+
+{
+    "email":"ankit.ganglia@gmail.com"
+}
+
+###
+
+POST http://localhost:3002/add-to-interested-buyers
+Content-Type: application/json
+
+{
+    "email":"noelveigas39736@gmail.com",
+    "patentId":"6780adca74c46b1849110661"
+}
+
+###
+
+POST http://localhost:3002/add-to-interested-buyers
+Content-Type: application/json
+
+{
+    "email":"aman.d.ganglia@gmail.com",
+    "patentId":"6780adca74c46b1849110661"
+}
+
+### 
+POST http://localhost:3002/get-interested-buyers
+Content-Type: application/json
+
+{
+    "patentId":"6780adca74c46b1849110661"
+}
+

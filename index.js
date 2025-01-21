@@ -6,6 +6,7 @@ const userRoutes = require("./routes/userRoutes");
 const patentRoutes = require("./routes/patentRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const transferRoutes = require("./routes/transferRoutes");
 const path = require("path")
 
 const app = express()
@@ -19,5 +20,6 @@ app.use("/",userRoutes)
 app.use("/",patentRoutes)
 app.use("/",orderRoutes)
 app.use("/admin",adminRoutes)
+app.use("/",transferRoutes)
 
 app.listen(3002,()=>{console.log("Server has started")})
