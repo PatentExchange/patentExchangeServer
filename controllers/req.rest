@@ -32,8 +32,14 @@ POST http://localhost:3002/add-to-interested-buyers
 Content-Type: application/json
 
 {
-    "email":"aman.d.ganglia@gmail.com",
-    "patentId":"6780adca74c46b1849110661"
+    "patentId":"6797ac59cc3ac50bc7003ed3",
+    "formData":{
+        "name":"Goutham",
+        "email":"goutham1105@gmail.com",
+        "purposeOfPurchase":"I want to sell this patent.",
+        "org":"MIT",
+        "phone":"098754321"
+    }
 }
 
 ### 
@@ -41,6 +47,52 @@ POST http://localhost:3002/get-interested-buyers
 Content-Type: application/json
 
 {
-    "patentId":"6780adca74c46b1849110661"
+    "patentId":"67873c2a791496503798791a"
 }
 
+###
+
+POST http://localhost:3002/update-buyers-status
+Content-Type: application/json
+
+{
+    "buyerEmail":"srinivas1105@gmail.com",
+    "patentId":"6797ac59cc3ac50bc7003ed3"
+}
+
+
+###
+
+POST http://localhost:3002/get-file-urls
+Content-Type: application/json
+
+{
+    "patent":{
+        {
+        "assignee": "qwertyu",
+        "category": "Chemical",
+        "createdAt": "2025-01-27T10:55:29.457Z",
+        "description": "qwertyu",
+        "filingDate": "2025-01-10T00:00:00.000Z",
+        "images": ["https://patentexchangebucket.s3.eu-north-1.amazonaws.com/images/1737975329053_What-is-PESTEL-Analysis.png"],
+        "price": 299,
+        "priorityDate": "2025-01-11T00:00:00.000Z",
+        "status": "Approved",
+        "submission_date": "2025-01-27T10:55:29.454Z",
+        "submitter": "Ankit",
+        "supportedDocuments": [
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1737976818482_Goutham Srinivas Mantripragada MERN resume.pdf",
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1738162712970_CCN Lab2 hub and switch 1.pdf",
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1738162712974_MCA-III CN Lab COURSE Plan Aug-Dec 2024_1.pdf",
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1738176263085_18MIT13C-U3.pdf",
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1738176263085_CCN Lab2 hub and switch 1.pdf",
+            "https://patentexchangebucket.s3.eu-north-1.amazonaws.com/supportedDocuments/1738176263085_MCA-III CN Lab COURSE Plan Aug-Dec 2024_1.pdf"
+        ],
+        "title": "Patent 1",
+        "type": "Utility",
+        "updatedAt": "2025-01-27T10:55:29.457Z",
+        "__v": 0,
+        "_id": "6797662152c3535b99ab3585"
+        }
+    }
+}

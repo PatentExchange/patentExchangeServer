@@ -36,7 +36,7 @@ const PatentSchema = new mongoose.Schema({
     enum: ["Mechanical", "Electrical", "Chemical", "Software", "Biological", "Other"], 
   },
   prior_art_references: {
-    type: [String],
+    type: String,
   },
   price:{
     type: Number,

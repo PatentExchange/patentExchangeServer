@@ -16,7 +16,7 @@ exports.addTransfer = async(req,res)=>{
     const sellerEmail= req.body.sellerEmail;
     const buyerEmail=req.body.buyerEmail;
     try{
-        const seller = await userModel.findOne({email:sellerEmail});
+        const seller = await userModel.findOne({name:sellerEmail});
         const buyer = await userModel.findOne({email:buyerEmail});
         const patent = req.body.patentId;
         const transferStatus = req.body.transferStatus;
@@ -37,14 +37,23 @@ exports.getTransfers = async(req,res)=>{
     try{
         const buyer = await userModel.findOne({email:req.body.email});
         const transfer = await transferModel.find({buyer:buyer._id});
-        const result = await Promise.all(
-            transfer.map(async (t) => {
-                const seller = await userModel.findById(t.seller);
+        console.log(transfer)
+        // const result = await Promise.all(
+        //     transfer.map(async (t) => {
+        //         const seller = await userModel.findById(t.seller);
+        //         const patent = await patentModel.findById(t.patent);
+        //         return { ...t.toObject(), seller, patent };
+        //     })
+        // );
+        const patents = await Promise.all(
+            transfer.map(async (t)=>{
                 const patent = await patentModel.findById(t.patent);
-                return { ...t.toObject(), seller, patent };
+                // console.log("patents are : ",patent)
+                const status = t.transferStatus;
+                return {patent,status};
             })
-        );
-        res.status(200).send({ buyer, transfers: result });
+        )
+        res.status(200).send({ patents});
     }catch(err){
         handleErrors(err,res);
     }
@@ -52,12 +61,11 @@ exports.getTransfers = async(req,res)=>{
 
 exports.addToInterestedBuyers = async(req,res)=>{
     try{
+        console.log(req.body.formData);
         const patentId = req.body.patentId;
-        const buyerEmail = req.body.email;
-        const buyer = await userModel.findOne({email:buyerEmail});
         const interestedBuyers = await interestedBuyersModel.findOneAndUpdate(
             { patentId: patentId },
-            { $addToSet: { users: buyer._id } }, // Appends if not already present
+            { $addToSet: { buyers: req.body.formData } }, // Appends if not already present
             { upsert: true, new: true } // Creates a new document if none exists
         );
         res.status(200).send(interestedBuyers);
@@ -66,18 +74,39 @@ exports.addToInterestedBuyers = async(req,res)=>{
     }
 }
 
+exports.updateBuyersStatus = async (req,res)=>{
+    try {
+        const { patentId, buyerEmail } = req.body;
+        const newStatus = "approved";
+        const buyer = await userModel.findOne({email:buyerEmail});
+        const updatedDoc = await interestedBuyersModel.findOneAndUpdate(
+            { patentId, "buyers.email": buyerEmail },
+            { $set: { "buyers.$.status": newStatus } },
+            { new: true }
+        );
+        const transfer = await transferModel.findOneAndUpdate({
+            patent:patentId,
+            buyer:buyer._id,
+            seller:req.body.sellerId,
+        },{$set:{transferStatus:"approved"}})
+        console.log(transfer)
+        if (!updatedDoc) {
+            return res.status(404).send({ message: "Buyer not found" });
+        }
+
+        res.status(200).send({ message: "Buyer status updated", updatedDoc });
+    } catch (err) {
+        handleErrors(err, res);
+    }
+}
+
 exports.getInterestedBuyers = async(req,res)=>{
     try{
         const patentId = req.body.patentId;
         const interestedBuyers = await interestedBuyersModel.findOne({patentId:patentId});
-        if (!interestedBuyers) {
-            return res.status(200).send({ users: [] });
-        }
-        const userObjects = await Promise.all(
-            interestedBuyers.users.map(userId => userModel.findById(userId))
-        );
-        res.status(200).send({ users: userObjects });
+        res.status(200).send({ interestedBuyers });
     }catch(err){
         handleErrors(err,res);
     }
 }
+
