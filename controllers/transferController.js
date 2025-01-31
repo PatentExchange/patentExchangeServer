@@ -76,24 +76,24 @@ exports.addToInterestedBuyers = async(req,res)=>{
 
 exports.updateBuyersStatus = async (req,res)=>{
     try {
-        const { patentId, buyerEmail } = req.body;
-        const newStatus = "approved";
+        const { patentId, buyerEmail , status } = req.body;
+        const newStatus = status;
         const buyer = await userModel.findOne({email:buyerEmail});
-        const updatedDoc = await interestedBuyersModel.findOneAndUpdate(
-            { patentId, "buyers.email": buyerEmail },
-            { $set: { "buyers.$.status": newStatus } },
-            { new: true }
-        );
-        const transfer = await transferModel.findOneAndUpdate({
-            patent:patentId,
-            buyer:buyer._id,
-            seller:req.body.sellerId,
-        },{$set:{transferStatus:"approved"}})
-        console.log(transfer)
-        if (!updatedDoc) {
-            return res.status(404).send({ message: "Buyer not found" });
-        }
-
+        console.log(buyer);
+            const updatedDoc = await interestedBuyersModel.findOneAndUpdate(
+                { patentId, "buyers.email": buyerEmail },
+                { $set: { "buyers.$.status": newStatus } },
+                { new: true }
+            );
+            const transfer = await transferModel.findOneAndUpdate({
+                patent:patentId,
+                buyer:buyer._id,
+                seller:req.body.sellerId,
+            },{$set:{transferStatus:newStatus}})
+            console.log(transfer)
+            if (!updatedDoc) {
+                return res.status(404).send({ message: "Buyer not found" });
+            }
         res.status(200).send({ message: "Buyer status updated", updatedDoc });
     } catch (err) {
         handleErrors(err, res);

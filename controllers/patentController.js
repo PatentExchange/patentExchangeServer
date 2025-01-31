@@ -1,9 +1,11 @@
 const mongoose = require("mongoose")
 const PatentModel = require("../models/Patents")
+const transferModel = require("../models/Transfers")
 const multer = require("multer")
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const path = require("path");
-const { getSignedUrl } =require("@aws-sdk/s3-request-presigner")
+const { getSignedUrl } =require("@aws-sdk/s3-request-presigner");
+const InterestedBuyers = require("../models/InterestedBuyers");
 
 
 const storage = multer.memoryStorage()
@@ -254,3 +256,15 @@ exports.getFileUrls=async(req,res)=>{
     }
 }
 
+exports.updatePatentOwner=async (req,res)=>{
+    try{
+        const {patentId,newOwner} = req.body;
+        const updPatent = await PatentModel.findOneAndUpdate({_id:patentId},{$set:{submitter:newOwner}});
+        await InterestedBuyers.deleteMany({patentId:patentId});
+        await transferModel.deleteMany({patent:patentId});
+        res.status(200).send({updPatent});
+    }
+    catch(err){
+        handleErrors(err,res);
+    }
+}
