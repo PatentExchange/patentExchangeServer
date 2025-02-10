@@ -1,5 +1,5 @@
 const express = require("express");
-const {getFileUrls,updatePatentOwner, addPatent,appendPatentFiles, getPatentsById, getPatents, getAllPatent } = require("../controllers/patentController");
+const {getFileUrls,updatePatent,updatePatentOwner, addPatent,appendPatentFiles, getPatentsById, getPatents, getAllPatent } = require("../controllers/patentController");
 
 const router = express.Router();
 
@@ -9,6 +9,8 @@ router.get("/get-patents/:submitter", getPatents);
 router.post("/add-patent-files",appendPatentFiles);
 router.post("/get-file-urls",getFileUrls);
 router.post("/update-patent-owner",updatePatentOwner);
+router.put("/update-patent/:id",updatePatent);
+
 
 
 

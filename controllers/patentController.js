@@ -56,7 +56,7 @@ exports.addPatent = [
     }]),
     async(req,res)=>{
         try{
-            console.log("req received",req);
+            console.log("req received",req.body);
             const {body,files}=req;
             const supportedDocumentsUrls = files.supportedDocuments
             ? await Promise.all(
@@ -71,7 +71,7 @@ exports.addPatent = [
         : [];
             const patentData = {
                 title: body.title,
-                submitter: body.submitter,
+                owner: body.owner,
                 submissionDate: body.submissionDate,
                 filingDate: body.filingDate,
                 priorityDate: body.priorityDate,
@@ -82,6 +82,7 @@ exports.addPatent = [
                 type: body.type,
                 status: body.status,
                 supportedDocuments: supportedDocumentsUrls,
+                verifiedBySME: body.verifiedBySME === "true" ? "requested" : "false",
                 images: imageUrls,
               };
               const patent = new PatentModel(patentData);
@@ -89,19 +90,16 @@ exports.addPatent = [
                 console.log("Patent saved successfully",patent);
                 res.status(200).json({ message: "Patent saved successfully", patent });
         }catch(error){
-            console.error(error);
-            res.status(500).json({
-                message: "An error occurred while fetching patent details",
-                error: error.message,
-              });
-              }
+           
+            handleErrors(error,res);
+        }
     }
 ]
 exports.getPatents = async (req,res) => {
-    const name = req.params.submitter;
+    const name = req.params.owner;
     try{
         //console.log("Get patent req recieved") 
-        const patents = await PatentModel.find({submitter:name});
+        const patents = await PatentModel.find({owner:name});
         // //console.log(patents);
         for (const patent of patents) {
             //console.log("Processing patent:", patent.title);
@@ -144,10 +142,10 @@ exports.getPatents = async (req,res) => {
             //console.log("done");
         }
         console.log(patents)
-     res.json(patents);
+     res.status(200).json(patents);
 
     }catch(error){
-        res.json(error);
+        handleErrors(err,res);
     }
 }
 exports.appendPatentFiles = [
@@ -165,13 +163,6 @@ exports.appendPatentFiles = [
         if (!patent) {
           return res.status(404).json({ message: "Patent not found" });
         }
-        // const supportedDocumentsUrls = files.supportedDocuments
-        //     ? await Promise.all(
-        //         files.supportedDocuments.map((file) =>
-        //           uploadToS3(file, "supportedDocuments")
-        //         )
-        //       )
-        //     : [];
         const newFilesUrls = files.length
           ? await Promise.all(
               files.map((file) => uploadToS3(file, "supportedDocuments"))
@@ -186,11 +177,7 @@ exports.appendPatentFiles = [
           patent,
         });
       } catch (error) {
-        console.error(error);
-        res.status(500).json({
-          message: "An error occurred while appending files",
-          error: error.message,
-        });
+        handleErrors(err,res);
       }
     },
   ];
@@ -220,9 +207,9 @@ exports.getAllPatent = async (req,res) =>{
             );
             //console.log("done");
         }
-        res.json({status:"Success",patents});
+        res.status(200).json({patents});
     }catch(err){
-        res.json({status:"FAILED",err});
+        handleErrors(err,res);
     }
 }
 
@@ -250,7 +237,7 @@ exports.getFileUrls=async(req,res)=>{
             })
         );
         console.log(patent.supportedDocuments);
-        res.json({status:"Success", docs: patent.supportedDocuments});
+        res.status(200).json({status:"Success", docs: patent.supportedDocuments});
     }catch(err){
         handleErrors(err,res)
     }
@@ -259,12 +246,63 @@ exports.getFileUrls=async(req,res)=>{
 exports.updatePatentOwner=async (req,res)=>{
     try{
         const {patentId,newOwner} = req.body;
-        const updPatent = await PatentModel.findOneAndUpdate({_id:patentId},{$set:{submitter:newOwner}});
+        const updPatent = await PatentModel.findOneAndUpdate({_id:patentId},{$set:{owner:newOwner}});
         await InterestedBuyers.deleteMany({patentId:patentId});
         await transferModel.deleteMany({patent:patentId});
         res.status(200).send({updPatent});
     }
     catch(err){
         handleErrors(err,res);
+    }
+}
+
+exports.updatePatent= async (req,res)=>{
+    try {
+        console.log(req.body);
+        // console.log("req received", req.files);
+        const { body, files } = req;
+        // console.log(files?.supportedDocuments);
+        const deletedPatent = await PatentModel.findByIdAndDelete(req.params.id)
+        console.log("deleted patent :" ,deletedPatent);
+        const supportedDocumentsUrls = files?.supportedDocuments
+            ? await Promise.all(
+                files?.supportedDocuments.map((file) =>
+                    uploadToS3(file, "supportedDocuments")
+                )
+            )
+            : [];
+        const imageUrls = files?.images
+            ? await Promise.all(
+                files?.images.map(async (file) => uploadToS3(file, "images"))
+            )
+            : [];
+        const patentData = {
+            title: body.title,
+            owner: body.owner,
+            submissionDate: body.submissionDate,
+            filingDate: body.filingDate,
+            priorityDate: body.priorityDate,
+            assignee: body.assignee,
+            description: body.description,
+            category: body.patentClassification,
+            priorArtReferences: body.priorArtReferences,
+            type: body.type,
+            status: body.status,
+            supportedDocuments: supportedDocumentsUrls,
+            verifiedBySME: body.verifiedBySME === "true" ? "requested" : "false",
+            images: imageUrls,
+        };
+        console.log(patentData);
+        const patent = new PatentModel(patentData);
+        await patent.save();
+        if (!patent) {
+            return res.status(404).json({ message: "Patent not found" });
+        }
+        // console.log("Patent updated successfully", patent.supportedDocuments);
+        res.status(200).json({ message: "Patent updated successfully", patent });
+    } catch (error) {
+
+        //  console.log(error);
+        handleErrors(error, res);
     }
 }

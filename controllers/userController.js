@@ -8,6 +8,14 @@ const nodemailer = require("nodemailer")
 var ObjectId = require('mongodb').ObjectId;
 
 
+const handleErrors = (err,res)=>{
+    console.log(err.message,err.code);
+    if(err.code === 11000){
+        return res.status(400).send({message:"User already exists."});
+    }
+    res.status(400).send({message:err.message,code:err.code});
+}
+
 let transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     auth:{
@@ -28,7 +36,7 @@ exports.signup = async (req, res) => {
             user,token
         });
     } catch (e) {
-        res.status(500).json({ message: "An error occurred during signup.", error: e });
+        handleErrors(e,res);
     }
 };
 exports.verifyOTP = async (req,res)=>{
@@ -64,7 +72,7 @@ exports.verifyOTP = async (req,res)=>{
             }
         } 
     }catch(error){
-        res.status(400).json({ status:"FAILED",message: error.message });
+        handleErrors(error,res);
     }
 }
 exports.login = async (req, res) => {
@@ -144,6 +152,13 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.getUserById = async (req, res) => {
+    console.log(req.body.token);
+    let decoded;
+        try {
+            decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: "Invalid token" });
+        }
     const id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid ID format" });
@@ -154,6 +169,7 @@ exports.getUserById = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "An error occurred while fetching the user.", error });
     }
+
 };
 
 //Function for sending otp

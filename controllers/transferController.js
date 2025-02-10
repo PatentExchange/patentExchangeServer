@@ -2,7 +2,24 @@ const express = require("express");
 const transferModel = require("../models/Transfers");
 const userModel = require("../models/Users");
 const patentModel = require("../models/Patents");
+const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } =require("@aws-sdk/s3-request-presigner");
+
 const interestedBuyersModel = require("../models/InterestedBuyers");
+
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKeyVariable = process.env.ACCESS_KEY_VARIABLE;
+const secretAccessKeyVariable = process.env.SECRET_ACCESS_KEY_VARIABLE;
+
+const s3 = new S3Client ({
+    credentials:{
+        accessKeyId:accessKeyVariable,
+        secretAccessKey: secretAccessKeyVariable,
+    },
+    region: bucketRegion
+});
 
 const handleErrors = (err,res)=>{
     console.log(err.message,err.code);
@@ -48,6 +65,20 @@ exports.getTransfers = async(req,res)=>{
         const patents = await Promise.all(
             transfer.map(async (t)=>{
                 const patent = await patentModel.findById(t.patent);
+                await Promise.all(
+                    patent.images.map(async (img, index) => {
+                        if (img) {
+                            const key = "images/" + await img.split('/').pop();  // Extract the key from the image URL
+                            const getObjectparams = {
+                                Bucket: bucketName,
+                                Key: key,
+                            };
+                            const command = new GetObjectCommand(getObjectparams);
+                            const url = await getSignedUrl(s3, command, { expiresIn: 604800 });
+                            patent.images[index] = url;  // Replace the image URL with the signed URL
+                        }
+                    })
+                );
                 // console.log("patents are : ",patent)
                 const status = t.transferStatus;
                 return {patent,status};

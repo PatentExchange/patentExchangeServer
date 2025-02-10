@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 
-// Define the schema for a Patent
 const PatentSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
   },
-  submitter: {
+  owner: {
     type: String,
     required: true,
   },
@@ -45,24 +44,29 @@ const PatentSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ["Utility", "Design", "Plant", "Other"], // Example types
+    enum: ["Utility", "Design", "Plant", "Other"], 
   },
   status: {
     type: String,
     required: true,
-    enum: ["Pending", "Approved", "Rejected"], // Example statuses
+    enum: ["Pending", "Approved", "Rejected"], 
+  },
+  verifiedBySME:{
+    type:String,
+    default : "false", 
   },
   supportedDocuments: [
     {
-      type: String, // URLs or file paths for the documents
+      type: String, 
     },
   ],
   images: [
     {
-      type: String, // URLs or file paths for the images
+      type: String,
     },
   ],
-}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
+}, { timestamps: true },
+); 
 
 const Patent = mongoose.model("Patent", PatentSchema);
 

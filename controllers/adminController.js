@@ -2,7 +2,13 @@ const mongoose = require('mongoose');
 const orderModel = require('../models/Orders');
 const PatentModel = require('../models/Patents');
 const UserModel = require('../models/Users');
-
+const handleErrors = (err,res)=>{
+    console.log(err.message,err.code);
+    if(err.code === 11000){
+        return res.status(400).send({message:"User already exists."});
+    }
+    res.status(400).send({message:err.message,code:err.code});
+}
 exports.adminDashboardDetails = async(req,res)=>{
     try{
         const noOfUsers = await UserModel.countDocuments();
@@ -15,7 +21,7 @@ exports.adminDashboardDetails = async(req,res)=>{
         const rejectedPatents = await PatentModel.countDocuments({status:"Rejected"});
         res.status(201).json({noOfUsers,activeUsers,inactiveUsers,suspendedUsers,noOfPatents,pendingPatents,approvedPatents,rejectedPatents});
     }catch(err){
-        res.status(500).json({message:"An error occurred while fetching dashboard details",error:err.message});
+        handleErrors(err,res);
     }
 }
 
@@ -30,7 +36,7 @@ exports.updateUser = async(req,res)=>{
         const updatedUser = await UserModel.findByIdAndUpdate(id,req.body.selectedUser);
         return res.status(200).json({message:"User details updated successfully",updatedUser});
     }catch(err){
-        res.status(500).json({message:"An error occurred while updating user details",error:err.message});
+        handleErrors(err,res);
     }
 }
 exports.suspendUser = async(req,res)=>{
@@ -44,6 +50,6 @@ exports.suspendUser = async(req,res)=>{
         const updatedUser = await UserModel.findByIdAndUpdate(id,{status:"Suspended"});
         return res.status(200).json({message:"User details updated successfully",updatedUser});
     }catch(err){
-        res.status(500).json({message:"An error occurred while updating user details",error:err.message});
+        handleErrors(err,res);
     }
 }
