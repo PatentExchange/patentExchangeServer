@@ -5,10 +5,19 @@ const PatentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  owner: {
-    type: String,
-    required: true,
-  },
+  owner: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  ],
+  ownerNames: [
+    {
+      type: String, // Store corresponding user names
+      required: true,
+    },
+  ],
   assignee: {
     type: String,
     required: true,

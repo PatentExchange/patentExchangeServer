@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
 
 const transferSchema = new Schema({
     buyer: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
-    seller: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
+    sellers: [{ type: Schema.Types.ObjectId, ref: 'Users', required: true }],
     patent: { type: Schema.Types.ObjectId, ref: 'Patent', required: true },
     transferStatus: { type: String, enum: ['pending', 'completed', 'withdrawn'], default: 'pending' }
 });
